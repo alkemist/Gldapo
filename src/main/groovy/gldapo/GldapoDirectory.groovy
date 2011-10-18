@@ -56,7 +56,7 @@ class GldapoDirectory implements SearchProvider {
      * </ul>
      */
     static final CONTEXT_SOURCE_PROPS = ["url", "urls", "base", "userDn", "password"]
-    static final POOLING_SOURCE_PROPS = ["maxActive", "maxIdle", "minIdle", "maxTotal", "timeBetweenEvictionRunsMillis", "minEvictableIdleTimeMillis", "whenExhaustedAction"]
+    static final POOLING_SOURCE_PROPS = ["maxActive", "maxIdle", "minIdle", "maxTotal", "timeBetweenEvictionRunsMillis", "minEvictableIdleTimeMillis", "whenExhaustedAction", "testWhileIdle", "testOnReturn"]
     
     /**
      * 
@@ -106,13 +106,13 @@ class GldapoDirectory implements SearchProvider {
 
         if(config.containsKey("pooling")) {
           def realSource = contextSource
+          realSource.pooled = false
           contextSource = new PoolingContextSource()
           contextSource.contextSource = realSource
           if (config.pooling.validate) {
             def validator = new DefaultDirContextValidator()
             contextSource.dirContextValidator = validator
             contextSource.testOnBorrow = true
-            contextSource.testWhileIdle = true
           }
           POOLING_SOURCE_PROPS.each {
             if(config.pooling.containsKey(it)) {
