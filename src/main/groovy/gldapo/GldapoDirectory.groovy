@@ -31,6 +31,8 @@ import org.springframework.ldap.NamingException
 import javax.naming.directory.ModificationItem
 import javax.naming.directory.Attributes
 import org.springframework.ldap.core.DistinguishedName
+import org.springframework.ldap.pool.factory.PoolingContextSource
+import org.springframework.ldap.pool.validation.DefaultDirContextValidator
 
 class GldapoDirectory implements SearchProvider {
     
@@ -54,6 +56,7 @@ class GldapoDirectory implements SearchProvider {
      * </ul>
      */
     static final CONTEXT_SOURCE_PROPS = ["url", "urls", "base", "userDn", "password"]
+    static final POOLING_SOURCE_PROPS = ["maxActive", "maxIdle", "minIdle", "maxTotal", "timeBetweenEvictionRunsMillis", "minEvictableIdleTimeMillis", "whenExhaustedAction"]
     
     /**
      * 
@@ -100,6 +103,23 @@ class GldapoDirectory implements SearchProvider {
             contextSource.baseEnvironmentProperties = config.env
         }
         contextSource.afterPropertiesSet()
+
+        if(config.containsKey("pooling")) {
+          def realSource = contextSource
+          contextSource = new PoolingContextSource()
+          contextSource.contextSource = realSource
+          if (config.pooling.validate) {
+            def validator = new DefaultDirContextValidator()
+            contextSource.dirContextValidator = validator
+            contextSource.testOnBorrow = true
+            contextSource.testWhileIdle = true
+          }
+          POOLING_SOURCE_PROPS.each {
+            if(config.pooling.containsKey(it)) {
+              contextSource."$it" = config.pooling."$it"
+            }
+          }
+        }
         
         this.template = new LdapTemplate(contextSource: contextSource)
         this.template.afterPropertiesSet()
