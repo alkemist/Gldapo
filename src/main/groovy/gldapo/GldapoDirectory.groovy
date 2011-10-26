@@ -134,7 +134,11 @@ class GldapoDirectory implements SearchProvider {
      * Returns the base DN for operations for this directory
      */
     DistinguishedName getBase() {
-        template?.contextSource?.base
+      def contextSource = template?.contextSource
+      if (contextSource?.class == PoolingContextSource.class) {
+        return contextSource?.contextSource?.base
+      }
+      return contextSource?.base
     }
     
     /**
