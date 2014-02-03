@@ -81,16 +81,20 @@ class SearchControls implements SearchControlProvider, Cloneable {
     def asType(Class c)
     {
         if (c.equals(javax.naming.directory.SearchControls)) {
-            def controls = new javax.naming.directory.SearchControls()
-            if (this.countLimit != null) controls.countLimit = this.countLimit
-            if (this.derefLinkFlag != null) controls.derefLinkFlag = this.derefLinkFlag
-            if (this.searchScope != null) controls.searchScope = this.searchScopeAsInteger
-            if (this.timeLimit != null) controls.timeLimit = this.timeLimit
-            controls.returningObjFlag = true
-            return controls
+            return asJavaxSearchControls()
         }
         else {
             super(c)
         }
+    }
+
+    def asJavaxSearchControls() {
+    	def controls = new javax.naming.directory.SearchControls()
+        if (this.countLimit != null) controls.countLimit = this.countLimit
+        if (this.derefLinkFlag != null) controls.derefLinkFlag = this.derefLinkFlag
+        if (this.searchScope != null) controls.searchScope = this.searchScopeAsInteger
+        if (this.timeLimit != null) controls.timeLimit = this.timeLimit
+        controls.returningObjFlag = true
+        controls
     }
 }

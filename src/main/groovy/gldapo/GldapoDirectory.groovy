@@ -143,7 +143,7 @@ class GldapoDirectory implements SearchProvider {
         ContextMapper mapper = new GldapoContextMapper(schemaRegistration: schemaRegistration, directory: this)
         ContextMapperCallbackHandler handler = new ContextMapperCallbackHandler(mapper)
 
-        javax.naming.directory.SearchControls jndiControls = controls as javax.naming.directory.SearchControls
+        javax.naming.directory.SearchControls jndiControls = controls.asJavaxSearchControls()
         jndiControls.returningAttributes = schemaRegistration.attributeMappings*.value.attributeName
         
         if (controls.pageSize == null || controls.pageSize < 1) {
